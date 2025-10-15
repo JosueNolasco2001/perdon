@@ -20,6 +20,13 @@ function App() {
     }));
     setHearts(newHearts);
     setTimeout(() => setHearts([]), 6000);
+    
+    // Abrir WhatsApp después de 2 segundos
+    setTimeout(() => {
+      const phoneNumber = '50498295612';
+      const message = encodeURIComponent('Sí Josue te perdono ❤️');
+      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+    }, 2000);
   };
 
   return (
