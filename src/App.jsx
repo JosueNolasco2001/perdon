@@ -16,17 +16,17 @@ function App() {
       id: Date.now() + i,
       left: Math.random() * 100,
       delay: Math.random() * 3,
-      size: Math.random() * 30 + 20
+      size: Math.random() * 40 + 30
     }));
     setHearts(newHearts);
     setTimeout(() => setHearts([]), 6000);
     
-    // Abrir WhatsApp después de 2 segundos
+    // Abrir WhatsApp después de 5 segundos
     setTimeout(() => {
       const phoneNumber = '50498295612';
       const message = encodeURIComponent('Sí Josue te perdono ❤️');
       window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
-    }, 2000);
+    }, 5000);
   };
 
   return (
@@ -102,7 +102,7 @@ function App() {
       {hearts.map((heart) => (
         <div
           key={heart.id}
-          className="absolute animate-float pointer-events-none"
+          className="absolute animate-float pointer-events-none z-50"
           style={{
             left: `${heart.left}%`,
             animationDelay: `${heart.delay}s`,
