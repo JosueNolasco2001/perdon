@@ -1,14 +1,205 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+// JSON con mensajes diarios para ansiedad
+const mensajesDiarios = [
+  {
+    id: 1,
+    frase: "Respira profundo. Este momento pasará, como todos los demás han pasado.",
+    emoji: "🌸"
+  },
+  {
+    id: 2,
+    frase: "No necesitas controlar todo. Está bien soltar y confiar en el proceso.",
+    emoji: "🦋"
+  },
+  {
+    id: 3,
+    frase: "Tus pensamientos no son hechos. Puedes observarlos sin creerlos.",
+    emoji: "☁️"
+  },
+  {
+    id: 4,
+    frase: "Hoy elijo la paz mental sobre la preocupación constante.",
+    emoji: "🌿"
+  },
+  {
+    id: 5,
+    frase: "Está bien no estar bien todo el tiempo. Eres humana y eso es suficiente.",
+    emoji: "💚"
+  },
+  {
+    id: 6,
+    frase: "El futuro no existe todavía. Solo tienes este momento, y en este momento estás a salvo.",
+    emoji: "🌅"
+  },
+  {
+    id: 7,
+    frase: "No estás sola en esto. La ansiedad miente, pero tú eres más fuerte que ella.",
+    emoji: "🌟"
+  },
+  {
+    id: 8,
+    frase: "Hoy me permito sentir sin juzgarme. Mis emociones son válidas.",
+    emoji: "🌺"
+  },
+  {
+    id: 9,
+    frase: "Cada día que superas la ansiedad, te haces más fuerte. Celebra tus pequeñas victorias.",
+    emoji: "🎈"
+  },
+  {
+    id: 10,
+    frase: "No puedes controlar tus pensamientos, pero sí puedes elegir a cuáles les prestas atención.",
+    emoji: "🕊️"
+  },
+  {
+    id: 11,
+    frase: "El descanso no es pereza. Tu mente necesita pausas para sanar.",
+    emoji: "🌙"
+  },
+  {
+    id: 12,
+    frase: "Está bien pedir ayuda. La vulnerabilidad es valentía, no debilidad.",
+    emoji: "🤝"
+  },
+  {
+    id: 13,
+    frase: "Hoy elijo ser amable conmigo misma, especialmente cuando mi mente no lo es.",
+    emoji: "💝"
+  },
+  {
+    id: 14,
+    frase: "Los pensamientos intrusivos son solo ruido. No definen quién eres.",
+    emoji: "🎵"
+  },
+  {
+    id: 15,
+    frase: "Cada respiración es un nuevo comienzo. Puedes empezar de nuevo en cualquier momento.",
+    emoji: "🌱"
+  },
+  {
+    id: 16,
+    frase: "No tienes que ser perfecta. Solo tienes que ser tú misma.",
+    emoji: "✨"
+  },
+  {
+    id: 17,
+    frase: "La ansiedad quiere que creas sus mentiras. Hoy eliges creer en tu fortaleza.",
+    emoji: "🦁"
+  },
+  {
+    id: 18,
+    frase: "Está bien tomarte un día a la vez, una hora a la vez, un minuto a la vez.",
+    emoji: "⏰"
+  },
+  {
+    id: 19,
+    frase: "Tu valor no depende de tu productividad. Eres valiosa simplemente por existir.",
+    emoji: "💎"
+  },
+  {
+    id: 20,
+    frase: "Hoy me doy permiso de soltar lo que no puedo controlar.",
+    emoji: "🎐"
+  },
+  {
+    id: 21,
+    frase: "La tormenta en tu mente pasará. Siempre lo hace.",
+    emoji: "🌈"
+  },
+  {
+    id: 22,
+    frase: "No estás fallando. Estás sobreviviendo, y eso ya es suficiente.",
+    emoji: "🌻"
+  },
+  {
+    id: 23,
+    frase: "Tus pensamientos ansiosos no predicen el futuro. Solo son pensamientos.",
+    emoji: "🔮"
+  },
+  {
+    id: 24,
+    frase: "Hoy elijo confiar en que todo saldrá bien, incluso si no sé cómo.",
+    emoji: "🙏"
+  },
+  {
+    id: 25,
+    frase: "Está bien si hoy solo lograste sobrevivir. Mañana es otro día.",
+    emoji: "🌃"
+  },
+  {
+    id: 26,
+    frase: "Tu ansiedad no te hace débil. Seguir adelante a pesar de ella te hace increíblemente fuerte.",
+    emoji: "💪"
+  },
+  {
+    id: 27,
+    frase: "No necesitas tener todas las respuestas ahora. Está bien vivir en la incertidumbre.",
+    emoji: "🎯"
+  },
+  {
+    id: 28,
+    frase: "Hoy me recuerdo que soy más grande que mis preocupaciones.",
+    emoji: "🌄"
+  },
+  {
+    id: 29,
+    frase: "La paz mental es posible. Cada pequeño paso cuenta.",
+    emoji: "🕊️"
+  },
+  {
+    id: 30,
+    frase: "Eres suficiente, tal como eres, incluso en tus días más difíciles.",
+    emoji: "🌟"
+  },
+  {
+    id: 31,
+    frase: "Hoy elijo la calma sobre el caos mental. Mereces paz.",
+    emoji: "🧘‍♀️"
+  }
+];
 
 function App() {
+  const [showModal, setShowModal] = useState(true);
   const [showMessage, setShowMessage] = useState(false);
   const [hearts, setHearts] = useState([]);
   const [showResponse, setShowResponse] = useState(false);
+  const [mensajeDelDia, setMensajeDelDia] = useState(null);
+  const [fechaActual, setFechaActual] = useState('');
+  const audioRef = useRef(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowMessage(true), 800);
-    return () => clearTimeout(timer);
+    // Obtener fecha actual
+    const hoy = new Date();
+    const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const fechaFormateada = hoy.toLocaleDateString('es-ES', opciones);
+    setFechaActual(fechaFormateada);
+
+    // Obtener mensaje del día basado en el día del mes
+    const diaDelMes = hoy.getDate();
+    const mensajeIndex = (diaDelMes - 1) % mensajesDiarios.length;
+    setMensajeDelDia(mensajesDiarios[mensajeIndex]);
+
+    // Configurar audio
+    audioRef.current = new Audio('/Mac Miller - Good News.mp3');
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.5;
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    };
   }, []);
+
+  const handleStartExperience = () => {
+    if (audioRef.current) {
+      audioRef.current.play().catch(err => console.log('Error reproduciendo audio:', err));
+    }
+    setShowModal(false);
+    setTimeout(() => setShowMessage(true), 800);
+  };
 
   const generateHearts = () => {
     setShowResponse(true);
@@ -31,6 +222,54 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-red-100 relative overflow-hidden">
+      {/* Modal inicial con blur */}
+      {showModal && (
+        <div className="fixed inset-0 backdrop-blur-lg flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 max-w-md w-full border-4 border-red-200 animate-fade-in">
+            <div className="text-center">
+              <div className="mb-6">
+                <img 
+                  src="https://i.pinimg.com/736x/8e/e5/db/8ee5dba7a8c2536408adff0f33459eef.jpg" 
+                  alt="Snoopy"
+                  className="w-32 h-32 object-contain mx-auto drop-shadow-2xl rounded-2xl"
+                />
+              </div>
+              <h2 className="text-3xl font-bold text-red-600 mb-4" style={{fontFamily: 'Comic Sans MS, cursive'}}>
+                ¡Hola Paolita! 💕
+              </h2>
+              
+              {/* Mensaje del día */}
+              {mensajeDelDia && (
+                <div className="mb-6 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-4 border-2 border-purple-300">
+                  <p className="text-sm text-purple-600 font-semibold mb-2">
+                    📅 {fechaActual}
+                  </p>
+                  <p className="text-lg font-bold text-purple-700 mb-2">
+                    {mensajeDelDia.emoji} Frase del día {mensajeDelDia.emoji}
+                  </p>
+                  <p className="text-md text-gray-700 italic leading-relaxed">
+                    "{mensajeDelDia.frase}"
+                  </p>
+                </div>
+              )}
+              
+              <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+                Agreguemos un poco de ambiente a esto... 🎵
+              </p>
+              <p className="text-md text-gray-600 mb-8">
+                Presiona el botón para escuchar la música que me identifica 🎶
+              </p>
+              <button
+                onClick={handleStartExperience}
+                className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full text-xl shadow-xl transform hover:scale-110 transition-all duration-300 border-4 border-white"
+              >
+                🎵 Reproducir Música 🎵
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Nubes animadas flotando */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
         {/* Nube 1 - Grande y esponjosa */}
